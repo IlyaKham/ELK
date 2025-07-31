@@ -1,16 +1,18 @@
 services:
   elasticsearch:
     image: elasticsearch:8.14.3
+    mem_limit: 1G
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
     ports:
       - 9200:9200
     volumes:
-      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/elasticsearch.yaml:/usr/share/elasticsearch/config/elasticsearch.yaml
 
   kibana:
     image: kibana:8.14.3
+    mem_limit: 800M
     ports:
       - "5601:5601"
     depends_on:
@@ -20,21 +22,22 @@ services:
 
   logstash:
     image: logstash:8.14.3
+    mem_limit: 1G
     environment:
       XPACK_MONITORING_ENABLED: "false"
       ES_HOST: "elasticsearch:9200"
     ports:
       - "5044:5044/udp"
     volumes:
-      - ./configs/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ./configs/logstash/pipelines.yaml:/usr/share/logstash/config/pipelines.yaml
       - ./configs/logstash/pipelines:/usr/share/logstash/config/pipelines
       - ./logs:/var/log/nginx
     depends_on:
           - elasticsearch
 
   nginx:
-    image: nginx:stable-alpine3.21-perl
+    image: nginx:latest
     ports:
-      - "80:80"
+      - "8081:80"
     volumes:
       - ./logs:/var/log/nginx
