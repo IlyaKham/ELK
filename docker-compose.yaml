@@ -35,6 +35,16 @@ services:
     depends_on:
           - elasticsearch
 
+    filebeat:
+    image: elastic/filebeat:8.14.3
+    volumes:
+      - ./logs:/var/log/app/
+      - ./configs/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+    depends_on:
+      - logstash
+      - elasticsearch
+      - kibana
+
   nginx:
     image: nginx:latest
     ports:
